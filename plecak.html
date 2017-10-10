@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Plecak HTML</title>
+	<style>
+		#form:after {
+			content: "";
+			display: table;
+			clear: both;
+		}
+	</style>
+</head>
+<body>
+		<form id="formL">
+			<h2>Pojemność plecaka</h2>
+			<input type="number" id="pojemnosc">			
+			
+			<h2>Liczba przedmiotów</h2>
+			<input type="number" id="liczba">
+			
+			<input type="button" onclick="getIt()" value="Zapisz">
+		</form>
+		
+		<form hidden>
+			<h2>1 przemiot</h2>
+			<p>Waga</p>
+			<input type="number">
+			<p>Wartość</p>
+			<input type="number">
+			<p>This is a paragraph.</p>
+		</form>
+		<p id="plecak"></p>
+		<p id="demo">tu</p>
+	<script>
+		var n;
+		var poj;
+		function getIt() {
+			n = document.getElementById("liczba").value;
+			poj = document.getElementById("pojemnosc").value;
+			document.getElementById("plecak").innerHTML = poj;
+			createForms(n);
+			document.getElementById("formL").setAttribute("style", "visibility: hidden");
+		}
+		
+		function createForms(n) {
+			for (var i = 0; i < n; i++) {
+				var formEl = document.createElement("form");
+				formEl.setAttribute("id", "form" + i);
+				formEl.setAttribute("style", "border: 2px solid red; text-align: center; float: left; width: 24%;");
+				
+				
+				var head2 = document.createElement("h2");
+				var head2Node = document.createTextNode(i + 1 + " przedmiot");
+				head2.appendChild(head2Node);
+				formEl.appendChild(head2);
+				
+				var p1 = document.createElement("p");
+				var p1Node = document.createTextNode("Waga:");
+				p1.appendChild(p1Node);
+				formEl.appendChild(p1);
+				
+				var input1 = document.createElement("input");
+				input1.setAttribute("type", "number");
+				input1.setAttribute("id", "input1" + i);
+				formEl.appendChild(input1);
+				
+				var p2 = document.createElement("p");
+				var p2Node = document.createTextNode("Wartość:");
+				p2.appendChild(p2Node);
+				formEl.appendChild(p2);
+				
+				var input2 = document.createElement("input");
+				input2.setAttribute("type", "number");
+				input2.setAttribute("id", "input2" + i);
+				formEl.appendChild(input2);
+				
+				var p3 = document.createElement("p");
+				formEl.appendChild(p3);
+				
+				var element = document.getElementsByTagName("body")[0];
+				element.appendChild(formEl);
+			}
+			var inputButton = document.createElement("input");
+			inputButton.setAttribute("type", "button");
+			inputButton.setAttribute("id", "checkPlecak");
+			inputButton.setAttribute("style", "width: 100%; height: 50px");
+			inputButton.setAttribute("value", "Check");
+			inputButton.setAttribute("onclick", "checkIt()");
+			element.appendChild(inputButton);
+		}
+		
+		function checkIt() {
+			var waga = [];
+			var wartosc = [];
+			var wprzezw = [];
+			var wPlecakuWaga = [];
+			var wPlecakuWartosc = [];
+			var profit = [];
+			var arL;
+			var arProL;
+			wPlecakuWaga[0] = 0;
+			wPlecakuWartosc[0] = 0;
+			
+			for (var i = 0; i < n; i++) {
+				waga[i] = document.getElementById("input1" + i).value;
+				wartosc[i] = document.getElementById("input2" + i).value;
+				wprzezw[i] = wartosc[i]/waga[i];
+				wPlecakuWaga.push(waga[i]);
+				wPlecakuWartosc.push(wartosc[i]);
+			}
+			for (var i = 0; i < n; i++) {
+				var x1 = Number(waga[i]);
+				var x2 = Number(wartosc[i]);
+				for (var j = 0; j < n; j++) {
+					if (i != j) {
+						x1 += Number(waga[j]);
+						wPlecakuWaga.push(x1);
+						x2 += Number(wartosc[j]);
+						wPlecakuWartosc.push(x2);
+					}
+				}
+			}
+			arL = wPlecakuWaga.length;
+			for (var i = 0; i < arL; i++) {
+				console.log(wPlecakuWaga[i] + " i " + wPlecakuWartosc[i]);
+			}
+			for (var i = 0; i < arL; i++) {
+				if (Number(wPlecakuWaga[i]) <= Number(poj)) {
+					profit.push(wPlecakuWartosc[i]);
+				}
+			}
+			console.log("chechhhhhhhhhhhhhhhhhhhhhhhhh");
+			arProL = profit.length;
+			for (var i = 0; i < arProL; i++) {
+					profit.sort(function(a, b){return b - a});
+			}
+			for (var i = 0; i < arProL; i++) {
+				console.log(profit[i]);
+			}
+			document.getElementById("demo").innerHTML = profit[0];
+		}
+	</script>
+
+</body>
+</html>
