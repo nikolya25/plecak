@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
 	<title>Plecak HTML</title>
 	<style>
 		#form:after {
@@ -30,27 +31,31 @@
 			<p>This is a paragraph.</p>
 		</form>
 		<p id="plecak"></p>
-		<p id="demo">tu</p>
 	<script>
 		var n;
 		var poj;
+		var malo;
+		var duzo;
+		var profit = 0;
+		var numer = 0;
+		
 		function getIt() {
 			n = document.getElementById("liczba").value;
 			poj = document.getElementById("pojemnosc").value;
 			document.getElementById("plecak").innerHTML = poj;
 			createForms(n);
+			duzo = Number(n) + 1;
 			document.getElementById("formL").setAttribute("style", "visibility: hidden");
 		}
 		
 		function createForms(n) {
-			for (var i = 0; i < n; i++) {
+			for (var i = 1; i <= n; i++) {
 				var formEl = document.createElement("form");
 				formEl.setAttribute("id", "form" + i);
 				formEl.setAttribute("style", "border: 2px solid red; text-align: center; float: left; width: 24%;");
 				
-				
 				var head2 = document.createElement("h2");
-				var head2Node = document.createTextNode(i + 1 + " przedmiot");
+				var head2Node = document.createTextNode(i + " przedmiot");
 				head2.appendChild(head2Node);
 				formEl.appendChild(head2);
 				
@@ -80,6 +85,7 @@
 				var element = document.getElementsByTagName("body")[0];
 				element.appendChild(formEl);
 			}
+			
 			var inputButton = document.createElement("input");
 			inputButton.setAttribute("type", "button");
 			inputButton.setAttribute("id", "checkPlecak");
@@ -87,57 +93,76 @@
 			inputButton.setAttribute("value", "Check");
 			inputButton.setAttribute("onclick", "checkIt()");
 			element.appendChild(inputButton);
+			
+			var p4 = document.createElement("p");
+			p4.setAttribute("id", "demo");
+			p4.setAttribute("style", "color: red; text-align: center; font-size: 50px");
+			element.appendChild(p4);
 		}
 		
 		function checkIt() {
-			var waga = [];
-			var wartosc = [];
-			var wprzezw = [];
-			var wPlecakuWaga = [];
-			var wPlecakuWartosc = [];
-			var profit = [];
-			var arL;
-			var arProL;
-			wPlecakuWaga[0] = 0;
-			wPlecakuWartosc[0] = 0;
+			var wPlecaku = [];
+			wPlecaku[0] = {"waga": 0, "wartosc": 0, "combi":[]};
+			wPlecaku[0].combi[0] = 0;
+			
+			for (var i = 1; i <= n; i++) {
+				wPlecaku[i] = {"waga": Number(document.getElementById("input1" + i).value), 
+									"wartosc": Number(document.getElementById("input2" + i).value),
+									"combi": []
+				};
+				wPlecaku[i].combi[0] = i;
+			}
 			
 			for (var i = 0; i < n; i++) {
-				waga[i] = document.getElementById("input1" + i).value;
-				wartosc[i] = document.getElementById("input2" + i).value;
-				wprzezw[i] = wartosc[i]/waga[i];
-				wPlecakuWaga.push(waga[i]);
-				wPlecakuWartosc.push(wartosc[i]);
-			}
-			for (var i = 0; i < n; i++) {
-				var x1 = Number(waga[i]);
-				var x2 = Number(wartosc[i]);
-				for (var j = 0; j < n; j++) {
-					if (i != j) {
-						x1 += Number(waga[j]);
-						wPlecakuWaga.push(x1);
-						x2 += Number(wartosc[j]);
-						wPlecakuWartosc.push(x2);
+				for (var j = 0; j < n ; j++) {
+					if (i != j && j > i) {
+						wPlecaku.push({"waga": wPlecaku[i + 1].waga + wPlecaku[j + 1].waga, 
+										"wartosc": wPlecaku[i + 1].wartosc + wPlecaku[j + 1].wartosc, 
+										"combi": []
+						});
+						wPlecaku[wPlecaku.length - 1].combi.push(wPlecaku[i + 1].combi[0]);
+						wPlecaku[wPlecaku.length - 1].combi.push(wPlecaku[j + 1].combi[0]);	
 					}
 				}
 			}
-			arL = wPlecakuWaga.length;
-			for (var i = 0; i < arL; i++) {
-				console.log(wPlecakuWaga[i] + " i " + wPlecakuWartosc[i]);
-			}
-			for (var i = 0; i < arL; i++) {
-				if (Number(wPlecakuWaga[i]) <= Number(poj)) {
-					profit.push(wPlecakuWartosc[i]);
+			
+			for (var k = 0; k < n; k++) {
+				malo = duzo;
+				duzo = wPlecaku.length - 1;
+				for (var i = malo; i <= duzo; i++) {
+					for (var j = 1; j <= n; j++) {
+						if (!(wPlecaku[i].combi.indexOf(j) > -1)) {
+							wPlecaku.push({"waga": wPlecaku[i].waga + wPlecaku[j].waga, 
+										"wartosc": wPlecaku[i].wartosc + wPlecaku[j].wartosc, 
+										"combi": []
+							});
+							for (var s = 0; s < wPlecaku[i].combi.length; s++) {
+								wPlecaku[wPlecaku.length - 1].combi.push(wPlecaku[i].combi[s]);
+							}	
+							wPlecaku[wPlecaku.length - 1].combi.push(wPlecaku[j].combi[0]);
+						}
+					}
 				}
 			}
-			console.log("chechhhhhhhhhhhhhhhhhhhhhhhhh");
-			arProL = profit.length;
-			for (var i = 0; i < arProL; i++) {
-					profit.sort(function(a, b){return b - a});
+			
+			for (var i = 0; i < duzo; i++) {
+				if (wPlecaku[i].waga <= poj && wPlecaku[i].wartosc > profit) {
+					profit = wPlecaku[i].wartosc;
+					numer = i;
+				}	
 			}
-			for (var i = 0; i < arProL; i++) {
-				console.log(profit[i]);
+			for (var j = 0; j < wPlecaku[numer].combi.length; j++ ) {
+					document.getElementById("form" + wPlecaku[numer].combi[j]).style.border = "2px solid green";
+					document.getElementById("form" + wPlecaku[numer].combi[j]).style.backgroundColor = "lightblue";
+					
 			}
-			document.getElementById("demo").innerHTML = profit[0];
+
+			document.getElementById("demo").innerHTML = profit;
+			
+			for (var i = 0; i < duzo; i++) {
+				console.log(wPlecaku[i].waga + " i " + wPlecaku[i].wartosc + " ::: " + wPlecaku[i].combi);
+			}
+			console.log(wPlecaku[numer].combi + " " + numer);
 		}
 	</script>
 
